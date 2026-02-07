@@ -1,5 +1,7 @@
 fastapi
 uvicorn
+faiss-cpu
+numpy
 
 youtube-transcript-api
 
@@ -7,3 +9,4 @@ groq
 
 python-dotenv
 pydantic
+huggingface-hub
