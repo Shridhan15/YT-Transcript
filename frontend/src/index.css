@@ -1,4 +1,38 @@
-
 @import "tailwindcss";
 
+/* Sidebar root container */
+.sidebar-root {
+  height: 100vh;
+  overflow-y: auto; /* only scrollbar */
+  overflow-x: hidden;
+}
 
+/* Hide scrollbar but keep scrolling */
+.hide-scrollbar {
+  scrollbar-width: none; /* Firefox */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Edge, Safari */
+}
+/* Prevent nested scrolling */
+.no-scroll {
+  overflow: hidden;
+}
+html {
+  scroll-behavior: smooth;
+}
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeInUp 0.35s ease-out forwards;
+}

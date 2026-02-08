@@ -5,7 +5,24 @@ def summarize_chunks(chunks):
 
     for chunk in chunks[:5]:  # limit initially
         prompt = f"""
-        Summarize the following YouTube transcript chunk clearly and concisely:
+        Provide a clear, readable summary of the video.
+
+Rules:
+- Divide the summary into clear sections.
+- Use short section titles.
+- Each section should be 2–4 bullet points or short paragraphs.
+- Do NOT start every section with the same word.
+- Keep language simple and readable.
+
+Format exactly like this:
+
+Section Title:
+- point
+- point
+
+Section Title:
+- point
+- point
 
         {chunk}
         """

@@ -1,59 +1,84 @@
-let sidebarIframe = null;
+// ================= CONFIG =================
+const SIDEBAR_WIDTH = 360;
+const SLIDE_DURATION = 300;
 
-function createSidebar() {
-    if (sidebarIframe) return;
+// ================= STATE =================
+let sidebar = null;
+let isSidebarOpen = false;
 
-    sidebarIframe = document.createElement("iframe");
-    sidebarIframe.id = "yt-ai-sidebar";
-    sidebarIframe.src = chrome.runtime.getURL("sidebar.html");
+// ================= SIDEBAR =================
 
-    sidebarIframe.style.position = "fixed";
-    sidebarIframe.style.top = "0";
-    sidebarIframe.style.right = "0";
-    sidebarIframe.style.width = "360px";
-    sidebarIframe.style.height = "100vh";
-    sidebarIframe.style.border = "none";
-    sidebarIframe.style.zIndex = "999999";
+function openSidebar() {
+    if (isSidebarOpen) return;
 
-    document.body.appendChild(sidebarIframe);
+    sidebar = document.createElement("iframe");
+    sidebar.id = "yt-ai-sidebar";
+    sidebar.src = chrome.runtime.getURL("sidebar.html");
 
-    sidebarIframe.onload = () => {
-        sendUrlToSidebar();
-    };
+    Object.assign(sidebar.style, {
+        position: "fixed",
+        top: "0",
+        right: "0",
+        width: `${SIDEBAR_WIDTH}px`,
+        height: "100vh",
+        border: "none",
+        zIndex: "999999",
+        background: "#0f172a",
+        transform: `translateX(${SIDEBAR_WIDTH}px)`,
+        transition: "transform 0.3s ease"
+    });
+
+    document.body.appendChild(sidebar);
+
+    // slide in
+    requestAnimationFrame(() => {
+        sidebar.style.transform = "translateX(0)";
+    });
+
+    sidebar.onload = sendUrlToSidebar;
+    isSidebarOpen = true;
 }
 
-function removeSidebar() {
-    if (sidebarIframe) {
-        sidebarIframe.remove();
-        sidebarIframe = null;
-    }
+function closeSidebar() {
+    if (!isSidebarOpen || !sidebar) return;
+
+    sidebar.style.transform = `translateX(${SIDEBAR_WIDTH}px)`;
+
+    setTimeout(() => {
+        sidebar.remove();
+        sidebar = null;
+        isSidebarOpen = false;
+    }, SLIDE_DURATION);
 }
+
+// ================= URL MESSAGE =================
 
 function sendUrlToSidebar() {
-    if (!sidebarIframe) return;
+    if (!sidebar) return;
 
-    sidebarIframe.contentWindow.postMessage(
-        { type: "YOUTUBE_URL", url: window.location.href },
+    sidebar.contentWindow.postMessage(
+        { type: "YOUTUBE_URL", url: location.href },
         "*"
     );
 }
 
-// Listen for toolbar toggle
+// ================= TOGGLE =================
+
 chrome.runtime.onMessage.addListener((msg) => {
     if (msg.type === "TOGGLE_SIDEBAR") {
-        if (sidebarIframe) {
-            removeSidebar();
-        } else {
-            createSidebar();
-        }
+        isSidebarOpen ? closeSidebar() : openSidebar();
     }
 });
 
-// Handle YouTube SPA navigation
+// ================= SPA HANDLING =================
+
 let lastUrl = location.href;
+
 new MutationObserver(() => {
     if (location.href !== lastUrl) {
         lastUrl = location.href;
-        sendUrlToSidebar();
+        if (isSidebarOpen) {
+            sendUrlToSidebar();
+        }
     }
 }).observe(document, { subtree: true, childList: true });
