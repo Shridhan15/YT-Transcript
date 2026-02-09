@@ -14,6 +14,7 @@ function openSidebar() {
     sidebar = document.createElement("iframe");
     sidebar.id = "yt-ai-sidebar";
     sidebar.src = chrome.runtime.getURL("sidebar.html");
+    sidebar.allow = "microphone";
 
     Object.assign(sidebar.style, {
         position: "fixed",
@@ -82,3 +83,72 @@ new MutationObserver(() => {
         }
     }
 }).observe(document, { subtree: true, childList: true });
+
+
+
+function getVideo() {
+    return document.querySelector("video");
+}
+window.addEventListener("message", (event) => {
+    if (event.data?.type !== "YT_AGENT_INTENT") return;
+
+    const { tasks } = event.data.payload || {};
+    if (!Array.isArray(tasks)) return;
+
+    console.log("YT Agent tasks received:", tasks);
+    tasks.forEach(executeTask);
+});
+
+
+function executeTask(task) {
+    const video = getVideo();
+
+    if (!video && task.intent !== "SEARCH") {
+        console.warn("No video element found");
+        return;
+    }
+
+    switch (task.intent) {
+        case "PLAY":
+            video.play();
+            break;
+
+        case "PAUSE":
+            video.pause();
+            break;
+
+        case "SEEK":
+            video.currentTime += task.value || 0;
+            break;
+
+        case "MUTE":
+            video.muted = true;
+            break;
+
+        case "UNMUTE":
+            video.muted = false;
+            break;
+
+        case "SPEED":
+            video.playbackRate = task.value || 1;
+            break;
+
+        case "NEXT": {
+            const nextBtn = document.querySelector(".ytp-next-button");
+            nextBtn?.click();
+            break;
+        }
+
+        case "SEARCH":
+            if (task.query) {
+                const q = encodeURIComponent(task.query);
+                window.location.href =
+                    `https://www.youtube.com/results?search_query=${q}`;
+            }
+            break;
+
+        default:
+            console.warn("Unknown intent:", task.intent);
+    }
+}
+

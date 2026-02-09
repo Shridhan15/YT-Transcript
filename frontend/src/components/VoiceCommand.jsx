@@ -21,6 +21,12 @@ export default function VoiceCommand() {
     recognition.continuous = false;
     recognition.interimResults = false;
 
+    recognition.onerror = (e) => {
+      console.error("Speech error:", e);
+      setListening(false);
+      setError("Voice recognition failed: " + e.error);
+    };
+
     setListening(true);
     setHeardText("");
     setError("");
@@ -35,7 +41,7 @@ export default function VoiceCommand() {
         const intentPayload = await voiceCommand(text);
         setLlmResponse(intentPayload);
 
-        window.postMessage(
+        window.parent.postMessage(
           {
             type: "YT_AGENT_INTENT",
             payload: intentPayload,
