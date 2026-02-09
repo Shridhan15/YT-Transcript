@@ -7,6 +7,7 @@ from services.transcript import fetch_transcript
 from services.chunker import chunk_text
 from services.summarizer import summarize_chunks
 from services.rag import build_rag_index, answer_question
+from services.voice_intent import extract_voice_intent
 
 
 
@@ -45,4 +46,7 @@ def ask(req: QuestionRequest):
     return {"answer": answer}
 
 
+@app.post("/voice-intent")
+def voice_intent(payload: dict):
+    return extract_voice_intent(payload["command"])
 

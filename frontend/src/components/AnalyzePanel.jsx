@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { analyzeVideo, askQuestion } from "../api/backend";
 import Summary from "./Summary";
 import Chat from "./Chat";
+import VoiceCommand from "./VoiceCommand";
 
 export default function AnalyzePanel() {
   const [url, setUrl] = useState("");
@@ -62,6 +63,8 @@ export default function AnalyzePanel() {
           {loading ? "Analyzing…" : "Analyze this video"}
         </button>
       )}
+
+      <VoiceCommand />
 
       {summary && <Summary text={summary} onDone={handleSummaryDone} />}
 

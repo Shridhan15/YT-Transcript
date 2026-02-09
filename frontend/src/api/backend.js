@@ -41,3 +41,28 @@ export async function askQuestion(question) {
 
     return response.json();
 }
+
+
+
+/**
+ * Send voice command text to backend for intent extraction
+ * @param {string} command - Spoken command text
+ * @returns {Promise<{tasks: Array}>}
+ */
+export async function voiceCommand(command) {
+    console.log("Sending voice command to backend:", command);
+    const response = await fetch(`${BASE_URL}/voice-intent`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ command }),
+    });
+    console.log("Received response from backend for voice command:", response);
+
+    if (!response.ok) {
+        throw new Error("Failed to process voice command");
+    }
+
+    return response.json();
+}
