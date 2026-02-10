@@ -1,68 +1,44 @@
+// src/api/backend.js
+
 const BASE_URL = "http://127.0.0.1:8000";
 
 /**
- * Analyze a YouTube video
- * @param {string} url - YouTube video URL
- * @returns {Promise<{summary: string}>}
+ * Calls the LangGraph agent on the backend.
+ * * @param {Object} params
+ * @param {string} params.input - The user's text or voice command.
+ * @param {string} params.url - The current YouTube video URL.
+ * @returns {Promise<{message: string, commands: Array}>}
  */
-export async function analyzeVideo(url) {
-    const response = await fetch(`${BASE_URL}/analyze-video`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ url }),
-    });
+export async function callAgent({ input, url }) {
+    try {
+        console.log("Calling Agent API with:", { input, url });
+        const response = await fetch(`${BASE_URL}/chat`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            // Map 'input' to 'message' to match the Python Pydantic model
+            body: JSON.stringify({
+                message: input,
+                url: url
+            }),
+        });
+        console.log("Agent API Response:", response);
 
-    if (!response.ok) {
-        throw new Error("Failed to analyze video");
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.detail || `Server error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        return data;
+
+    } catch (error) {
+        console.error("Agent API Call Failed:", error);
+        // Return a fallback so the UI doesn't crash
+        return {
+            message: "Sorry, I couldn't connect to the server. Please check if the backend is running.",
+            commands: []
+        };
     }
-
-    return response.json();
-}
-
-/**
- * Ask a question about the analyzed video (RAG)
- * @param {string} question
- * @returns {Promise<{answer: string}>}
- */
-export async function askQuestion(question) {
-    const response = await fetch(`${BASE_URL}/ask`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ question }),
-    });
-
-    if (!response.ok) {
-        throw new Error("Failed to get answer");
-    }
-
-    return response.json();
-}
-
-
-
-/**
- * Send voice command text to backend for intent extraction
- * @param {string} command - Spoken command text
- * @returns {Promise<{tasks: Array}>}
- */
-export async function voiceCommand(command) {
-    console.log("Sending voice command to backend:", command);
-    const response = await fetch(`${BASE_URL}/voice-intent`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ command }),
-    });
-    console.log("Received response from backend for voice command:", response);
-
-    if (!response.ok) {
-        throw new Error("Failed to process voice command");
-    }
-
-    return response.json();
 }

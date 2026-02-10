@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-export default function TypingText({ text = "", speed = 18, onDone }) {
+export default function TypingText({ text = "", speed = 18 }) {
   const [displayed, setDisplayed] = useState("");
   const indexRef = useRef(0);
   const intervalRef = useRef(null);
