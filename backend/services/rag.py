@@ -2,7 +2,7 @@ from services.embeddings import embed_texts
 from services.vector_store import VectorStore
 from services.llm import call_llm
 
-vector_store = None  # in-memory for now
+vector_store = None   
 
 
 def build_rag_index(chunks):
@@ -23,7 +23,7 @@ def answer_question(question: str):
 
     prompt = f"""
 Answer the question using ONLY the context below.
-If the answer is not in the context, say "Not mentioned in the video".
+If the answer is not in the context, say "Not mentioned in the video" and do not use **, keep the answer humanly.
 
 Context:
 {context}

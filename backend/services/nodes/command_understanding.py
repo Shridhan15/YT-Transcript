@@ -7,8 +7,7 @@ from services.agent_state import AgentState
 load_dotenv()
 
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
-
-# --- MERGED SYSTEM PROMPT ---
+ 
 SYSTEM_PROMPT = """
 You are a YouTube AI Assistant. 
 Your job is to analyze the user's input and decide on actions (Tasks) and capabilities (QA/Analysis).

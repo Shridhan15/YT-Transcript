@@ -146,8 +146,9 @@ function executeTask(task) {
             break;
         }
         case "SEARCH":
-            if (task.query) {
-                const q = encodeURIComponent(task.query);
+            const searchTerm = task.query || task.value;
+            if (searchTerm) {
+                const q = encodeURIComponent(searchTerm);
                 window.location.href = `https://www.youtube.com/results?search_query=${q}`;
             }
             break;

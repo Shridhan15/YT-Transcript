@@ -15,10 +15,9 @@ def analyze_node(state: AgentState) -> dict:
         # 2. Chunk Text
         chunks = chunk_text(transcript_text)
         
-        # 3. Build Index (for future QA)
+        # 3. Build Index  
         build_rag_index(chunks)
-        
-        # 4. Summarize
+         
         # Extract just the text from chunks if your chunker returns objects
         chunk_texts = [c["text"] if isinstance(c, dict) else c for c in chunks]
         summary = summarize_chunks(chunk_texts)

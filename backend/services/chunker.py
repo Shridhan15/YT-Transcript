@@ -1,4 +1,4 @@
-# services/chunker.py
+ 
 def chunk_text(text: str, chunk_size=1000, overlap=200):
     chunks = []
     start = 0

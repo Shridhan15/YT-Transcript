@@ -9,9 +9,7 @@ def qa_node(state: AgentState) -> dict:
     if not question:
         return {} # No question to answer
 
-    try:
-        # Assuming answer_question uses the vector store built in analyze_node
-        # or handles its own retrieval
+    try: 
         answer = answer_question(question)
         
         return {"message_parts": [f"\n\n**Answer:** {answer}"]}

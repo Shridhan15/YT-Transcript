@@ -1,7 +1,6 @@
 from langgraph.graph import StateGraph, END
 from services.agent_state import AgentState
-
-# Import your nodes
+ 
 from services.nodes.command_understanding import command_understanding_node
 from services.nodes.task_node import task_node
 from services.nodes.qa_node import qa_node
@@ -22,8 +21,7 @@ def route_dispatch(state: AgentState):
         
     if state.get("analyze"):
         routes.append("analyze")
-        
-    # Fallback: if no logic nodes are triggered, go to merge
+         
     if not routes:
         return ["merge"]
         
@@ -54,7 +52,7 @@ def build_agent():
         }
     )
 
-    # 4. Add Fan-In Edges (All parallel nodes go to merge)
+    # 4. Add Fan-In Edges 
     workflow.add_edge("task", "merge")
     workflow.add_edge("qa", "merge")
     workflow.add_edge("analyze", "merge")

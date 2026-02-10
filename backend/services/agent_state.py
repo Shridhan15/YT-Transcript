@@ -10,10 +10,7 @@ class AgentState(TypedDict):
     tasks: List[dict]           
     qa_enabled: bool
     qa_question: Optional[str]
-    analyze: bool
-
-    # Outputs (Parallel Safe)
-    # This allows multiple nodes to append messages without overwriting each other
+    analyze: bool 
     message_parts: Annotated[List[str], operator.add]
     
     # Final combined output

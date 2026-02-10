@@ -13,6 +13,7 @@ Rules:
 - Each section should be 2–4 bullet points or short paragraphs.
 - Do NOT start every section with the same word.
 - Keep language simple and readable.
+- Do not use ** for emphasis, keep the summary humanly.
 
 Format exactly like this:
 

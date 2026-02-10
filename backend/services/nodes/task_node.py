@@ -1,11 +1,11 @@
-from services.agent_state import AgentState
-
-# Add synonyms to map to valid YouTube actions
+from services.agent_state import AgentState 
 INTENT_MAP = {
     "SKIP": "SEEK",
     "REWIND": "SEEK",
     "FORWARD": "SEEK",
-    "JUMP": "SEEK"
+    "JUMP": "SEEK",
+    "FIND": "SEARCH",   
+    "LOOKUP": "SEARCH", 
 }
 
 ALLOWED_INTENTS = {"PLAY", "PAUSE", "SEEK", "SEARCH", "MUTE", "UNMUTE", "SPEED", "NEXT"}
@@ -16,12 +16,11 @@ def task_node(state: AgentState) -> dict:
     for task in state["tasks"]:
         raw_intent = task.get("intent")
         if isinstance(task, dict) and raw_intent:
-            
-            # 1. Normalize Intent (Handle SKIP -> SEEK)
+             
             intent = raw_intent.upper()
             if intent in INTENT_MAP:
                 intent = INTENT_MAP[intent]
-                task["intent"] = intent # Update the task object
+                task["intent"] = intent 
             
             # 2. Check if allowed
             if intent in ALLOWED_INTENTS:
