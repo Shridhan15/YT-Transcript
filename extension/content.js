@@ -90,9 +90,7 @@ chrome.runtime.onMessage.addListener((msg) => {
         isSidebarOpen ? closeSidebar() : openSidebar();
     }
 });
-
-// ================= SPA URL MONITORING =================
-// YouTube is a Single Page App, so we need to watch for URL changes
+ 
 let lastUrl = location.href;
 
 new MutationObserver(() => {

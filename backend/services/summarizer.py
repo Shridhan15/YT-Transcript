@@ -5,34 +5,63 @@ def summarize_chunks(chunks):
 
     for chunk in chunks[:5]:  # limit initially
         prompt = f"""
-        Provide a clear, readable summary of the video.
+You are generating a structured video summary.
 
-Rules:
-- Divide the summary into clear sections.
-- Use short section titles.
-- Each section should be 2–4 bullet points or short paragraphs.
-- Do NOT start every section with the same word.
-- Keep language simple and readable.
-- Do not use ** for emphasis, keep the summary humanly.
+Strict Instructions:
+- Start directly with the first section title.
+- Do NOT write introductions like "Here is the summary" or "Providing a summary".
+- Do NOT use bold text or special formatting symbols like **.
+- Do NOT add a heading like "Summary:".
+- Follow the exact format below.
+- Keep language natural and human.
+- Avoid repeating the same opening word across sections.
+- Keep it clean and readable.
 
-Format exactly like this:
-
-Section Title:
-- point
-- point
+Output Format (follow exactly):
 
 Section Title:
-- point
-- point
+- Point
+- Point
+- Point
 
-        {chunk}
-        """
+Section Title:
+- Point
+- Point
+
+Now summarize this transcript section:
+
+{chunk}
+"""
+
         summaries.append(call_llm(prompt))
 
     final_prompt = f"""
-    Combine the following partial summaries into one coherent summary:
+You are combining multiple partial summaries into one clean, well-structured summary.
 
-    {summaries}
-    """
+Strict Rules:
+- Start directly with a section title.
+- Do NOT write introductions.
+- Do NOT write "Summary:".
+- Do NOT use bold formatting.
+- Keep clean section titles.
+- Each section must contain 2–4 bullet points.
+- Remove repetition across sections.
+- Make the flow natural and cohesive.
+- Keep it human and readable.
+
+Follow this format exactly:
+
+Section Title:
+- Point
+- Point
+
+Section Title:
+- Point
+- Point
+
+Partial Summaries:
+{summaries}
+"""
+
 
     return call_llm(final_prompt)

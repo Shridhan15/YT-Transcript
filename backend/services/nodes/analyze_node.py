@@ -22,7 +22,7 @@ def analyze_node(state: AgentState) -> dict:
         chunk_texts = [c["text"] if isinstance(c, dict) else c for c in chunks]
         summary = summarize_chunks(chunk_texts)
 
-        return {"message_parts": [f"\n\n**Summary:** {summary}"]}
+        return {"message_parts": [f"\n\n {summary}"]}
 
     except Exception as e:
         print(f"Analysis Error: {e}")

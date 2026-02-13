@@ -41,13 +41,13 @@ export default function VoiceCommand({ onVoiceInput, disabled }) {
       <button
         onClick={startListening}
         disabled={disabled}
-        className={`text-sm py-2 rounded-xl transition-all ${
+        className={`cursor-pointer text-sm py-2 rounded-xl transition-all ${
           listening
             ? "bg-red-600 animate-pulse"
             : "bg-zinc-700 hover:bg-zinc-600 disabled:opacity-50"
         }`}
       >
-        {listening ? "Listening..." : "🎙️ Voice Command"}
+        {listening ? "Listening..." : " Voice Command"}
       </button>
       {error && <span className="text-xs text-red-400">{error}</span>}
     </div>

@@ -12,7 +12,7 @@ def qa_node(state: AgentState) -> dict:
     try: 
         answer = answer_question(question)
         
-        return {"message_parts": [f"\n\n**Answer:** {answer}"]}
+        return {"message_parts": [f"\n\n{answer}"]}
     
     except Exception as e:
         print(f"QA Error: {e}")

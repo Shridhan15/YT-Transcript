@@ -148,9 +148,9 @@ export default function AnalyzePanel() {
             handleUserQuery("Analyze this video and give me a summary")
           }
           disabled={loading}
-          className="bg-blue-600 hover:bg-blue-700 text-white text-sm py-3 rounded-xl disabled:opacity-50 transition-all font-medium"
+          className="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white text-sm py-3 rounded-xl disabled:opacity-50 transition-all font-medium"
         >
-          {loading ? "Thinking..." : "✨ Analyze & Summarize"}
+          {loading ? "Thinking..." : " Analyze & Summarize"}
         </button>
 
         <VoiceCommand

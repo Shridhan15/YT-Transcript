@@ -20,16 +20,30 @@ def answer_question(question: str):
     relevant_chunks = vector_store.search(query_embedding, k=4)
 
     context = "\n\n".join(relevant_chunks)
-
     prompt = f"""
-Answer the question using ONLY the context below.
-If the answer is not in the context, say "Not mentioned in the video" and do not use **, keep the answer humanly.
+You are answering a question using retrieved transcript context.
+
+Strict Rules:
+- Use ONLY the information present in the Context.
+- Do NOT use outside knowledge.
+- Do NOT assume anything not explicitly stated.
+- If the answer is not clearly found in the Context, reply exactly:
+Not mentioned in the video
+- Do NOT add introductions.
+- Do NOT add explanations unless required by the question.
+- Do NOT use bold, markdown, or formatting symbols.
+- Do NOT restate the question.
+- Do NOT write anything before or after the answer.
+- Keep the answer clear, natural, and concise.
 
 Context:
 {context}
 
 Question:
 {question}
+
+Answer:
 """
+
 
     return call_llm(prompt)
