@@ -55,15 +55,20 @@ class QuestionRequest(BaseModel):
 class ChatRequest(BaseModel):
     message: str
     url: str
+    currentTime: float
 
 
 @app.post("/chat")
 def chat(req: ChatRequest):
-    # Initialize state
     initial_state = {
         "user_input": req.message,
         "url": req.url,
-        "message_parts": [] # Important to init empty list
+        "current_video_time": req.currentTime, 
+        "message_parts": [],
+        "tasks": [],
+        "qa_enabled": False,
+        "analyze": False,
+        "time_range": None
     }
     
     # Run Graph

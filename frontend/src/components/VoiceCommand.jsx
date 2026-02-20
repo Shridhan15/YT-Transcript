@@ -23,7 +23,6 @@ export default function VoiceCommand({ onVoiceInput, disabled }) {
     recognition.onresult = (event) => {
       const text = event.results[0][0].transcript;
       setListening(false);
-      // Pass text up to parent immediately
       onVoiceInput(text);
     };
 

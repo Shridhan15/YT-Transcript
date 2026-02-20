@@ -22,4 +22,4 @@ def embed_texts(texts: list[str]) -> np.ndarray:
 
 if __name__ == "__main__":
     emb = embed_texts(["Hello world", "YouTube AI assistant"])
-    print(emb.shape)   # should be (2, 384)
+    print(emb.shape)  

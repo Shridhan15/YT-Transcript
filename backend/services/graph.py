@@ -8,39 +8,42 @@ from services.nodes.analyze_node import analyze_node
 from services.nodes.merge_node import merge_node
 
 def route_dispatch(state: AgentState):
-    """
-    Determines which nodes to run in parallel.
-    """
     routes = []
     
+    print(f"DEBUG Router received state keys: {state.keys()}")
+    print(f"DEBUG Router 'analyze' value: {state.get('analyze')}")
+    
+    if state.get("analyze") is True:
+        routes.append("analyze")
+        
     if state.get("tasks"):
         routes.append("task")
         
-    if state.get("qa_enabled"):
+    if state.get("qa_enabled") is True or state.get("time_range") is not None:
         routes.append("qa")
-        
-    if state.get("analyze"):
-        routes.append("analyze")
          
     if not routes:
+        print("DEBUG Router: No routes found, moving to merge")
         return ["merge"]
-        
+    
+    print(f"DEBUG Router: Directing to nodes: {routes}")
     return routes
+
 
 def build_agent():
     workflow = StateGraph(AgentState)
 
-    # 1. Add Nodes
+    # Add Nodes
     workflow.add_node("understand", command_understanding_node)
     workflow.add_node("task", task_node)
     workflow.add_node("qa", qa_node)
     workflow.add_node("analyze", analyze_node)
     workflow.add_node("merge", merge_node)
 
-    # 2. Set Entry Point
+    #  Set Entry Point
     workflow.set_entry_point("understand")
 
-    # 3. Add Conditional Edges (Fan-Out)
+    #  Add Conditional Edges 
     workflow.add_conditional_edges(
         "understand",
         route_dispatch,
@@ -52,12 +55,11 @@ def build_agent():
         }
     )
 
-    # 4. Add Fan-In Edges 
+    
     workflow.add_edge("task", "merge")
     workflow.add_edge("qa", "merge")
     workflow.add_edge("analyze", "merge")
 
-    # 5. Finish
     workflow.add_edge("merge", END)
 
     return workflow.compile()

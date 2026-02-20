@@ -10,12 +10,10 @@ export default function TypingText({ text = "", speed = 18 }) {
   useEffect(() => {
     if (!text) return;
 
-    // 🚫 If same text already finished typing, do NOTHING
     if (lastTextRef.current === text && finishedRef.current) {
       return;
     }
 
-    // 🔄 New text → reset state
     lastTextRef.current = text;
     finishedRef.current = false;
     indexRef.current = 0;

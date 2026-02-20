@@ -1,42 +1,47 @@
 import { useEffect, useState, useRef } from "react";
 import { callAgent } from "../api/backend";
 import VoiceCommand from "./VoiceCommand";
-import Typewriter from "./Typewriter"; // Import the new component
+import Typewriter from "./Typewriter"; 
 
 export default function AnalyzePanel() {
   const [url, setUrl] = useState("");
-  // State is now a list of messages: { role: "user" | "ai", text: "..." }
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // Ref for auto-scrolling
   const messagesEndRef = useRef(null);
 
-  // 1. Listen for URL
   useEffect(() => {
     const handler = (event) => {
       if (event.data?.type === "YOUTUBE_URL") {
         console.log("Received URL:", event.data.url);
         setUrl(event.data.url);
-        setMessages([]); // Clear chat on new video
+        setMessages([]); 
       }
     };
     window.addEventListener("message", handler);
-    window.parent.postMessage({ type: "SIDEBAR_READY" }, "*"); // Handshake
+    window.parent.postMessage({ type: "SIDEBAR_READY" }, "*"); 
     return () => window.removeEventListener("message", handler);
   }, []);
 
-  // 2. Auto-scroll to bottom whenever messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
 
-  // 3. Unified Handler
   const handleUserQuery = async (queryText) => {
     if (!url) return;
     if (loading) return;
+    window.parent.postMessage({ type: "GET_VIDEO_TIME" }, "*");
+    const currentTime = await new Promise((resolve) => {
+      const handler = (event) => {
+        if (event.data?.type === "VIDEO_TIME_RESPONSE") {
+          window.removeEventListener("message", handler);
+          resolve(event.data.currentTime);
+        }
+      };
+      window.addEventListener("message", handler);
+      setTimeout(() => resolve(0), 500);
+    });
 
-    // Add User Message immediately
     const userMsg = { role: "user", text: queryText };
     setMessages((prev) => [...prev, userMsg]);
     setLoading(true);
@@ -45,13 +50,12 @@ export default function AnalyzePanel() {
       const result = await callAgent({
         input: queryText,
         url,
+        currentTime: currentTime,
       });
 
-      // Add AI Message
       const aiMsg = { role: "ai", text: result.message };
       setMessages((prev) => [...prev, aiMsg]);
 
-      // Execute Tasks
       if (result.tasks?.length) {
         window.parent.postMessage(
           { type: "YT_AGENT_INTENT", payload: result },
@@ -75,16 +79,13 @@ export default function AnalyzePanel() {
         YouTube AI Assistant
       </h2>
 
-      {/* --- CHAT HISTORY AREA (Grow to fill space) --- */}
       <div className="flex-1 overflow-y-auto space-y-4 mb-4 pr-2 no-scrollbar">
-        {/* Welcome Message */}
         {messages.length === 0 && (
           <div className="text-zinc-500 text-sm text-center mt-10 italic">
             Ask me to summarize, find a topic, or control the video!
           </div>
         )}
 
-        {/* Map through messages */}
         {messages.map((msg, idx) => (
           <div
             key={idx}
@@ -110,7 +111,6 @@ export default function AnalyzePanel() {
               }`}
             >
               {msg.role === "ai" ? (
-                // Only animate the LATEST message to avoid re-typing old ones
                 idx === messages.length - 1 ? (
                   <Typewriter text={msg.text} />
                 ) : (
@@ -123,7 +123,6 @@ export default function AnalyzePanel() {
           </div>
         ))}
 
-        {/* Loading Bubble */}
         {loading && (
           <div className="self-start max-w-[85%]">
             <span className="text-[10px] text-blue-400 font-bold mb-1">AI</span>
@@ -137,11 +136,9 @@ export default function AnalyzePanel() {
           </div>
         )}
 
-        {/* Invisible div to scroll to */}
         <div ref={messagesEndRef} />
       </div>
 
-      {/* --- CONTROLS AREA (Fixed at bottom) --- */}
       <div className="flex flex-col gap-3 pt-2 border-t border-zinc-800">
         <button
           onClick={() =>

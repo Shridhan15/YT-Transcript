@@ -81,6 +81,17 @@ window.addEventListener("message", (event) => {
             tasks.forEach(executeTask);
         }
     }
+
+    if (event.data?.type === "GET_VIDEO_TIME") {
+        const video = getVideo();
+        const currentTime = video ? video.currentTime : 0;
+        
+        // Send it back to the iframe
+        sidebar.contentWindow.postMessage({
+            type: "VIDEO_TIME_RESPONSE",
+            currentTime: currentTime
+        }, "*");
+    }
 });
 
 // ================= CHROME EVENTS =================

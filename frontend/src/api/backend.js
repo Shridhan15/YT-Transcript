@@ -5,22 +5,22 @@ const BASE_URL = "http://127.0.0.1:8000";
 /**
  * Calls the LangGraph agent on the backend.
  * * @param {Object} params
- * @param {string} params.input - The user's text or voice command.
- * @param {string} params.url - The current YouTube video URL.
+ * @param {string} params.input -  user's text or voice command.
+ * @param {string} params.url -  current YouTube video URL.
  * @returns {Promise<{message: string, commands: Array}>}
  */
-export async function callAgent({ input, url }) {
+export async function callAgent({ input, url, currentTime }) {
     try {
-        console.log("Calling Agent API with:", { input, url });
+        console.log("Calling Agent API with:", { input, url, currentTime });
         const response = await fetch(`${BASE_URL}/chat`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
-            // Map 'input' to 'message' to match the Python Pydantic model
             body: JSON.stringify({
                 message: input,
-                url: url
+                url: url,
+                currentTime
             }),
         });
         console.log("Agent API Response:", response);
@@ -35,7 +35,6 @@ export async function callAgent({ input, url }) {
 
     } catch (error) {
         console.error("Agent API Call Failed:", error);
-        // Return a fallback so the UI doesn't crash
         return {
             message: "Sorry, I couldn't connect to the server. Please check if the backend is running.",
             commands: []

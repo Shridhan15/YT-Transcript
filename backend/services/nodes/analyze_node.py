@@ -5,25 +5,31 @@ from services.rag import build_rag_index
 from services.summarizer import summarize_chunks
 
 def analyze_node(state: AgentState) -> dict:
+    print("DEBUG: Entered Analyze Node")
     if not state.get("url"):
         return {"message_parts": ["I need a video URL to analyze content."]}
 
     try:
-        # 1. Get Transcript
-        transcript_text = fetch_transcript(state["url"])
+        url = state.get("url")
+    
+        transcript_list = fetch_transcript(url)
+        if not transcript_list:
+            return {"message_parts": ["Could not retrieve transcript."]}
         
-        # 2. Chunk Text
-        chunks = chunk_text(transcript_text)
+        full_text = " ".join([chunk['text'] for chunk in transcript_list])
+    
+
+        print(f"DEBUG: Transcript fetched, length: {len(transcript_list)}")
         
-        # 3. Build Index  
+        chunks = chunk_text(full_text)
         build_rag_index(chunks)
          
-        # Extract just the text from chunks if your chunker returns objects
+        # Summarize
         chunk_texts = [c["text"] if isinstance(c, dict) else c for c in chunks]
         summary = summarize_chunks(chunk_texts)
 
-        return {"message_parts": [f"\n\n {summary}"]}
+        return {"message_parts": [f"\n\n{summary}"]}
 
     except Exception as e:
         print(f"Analysis Error: {e}")
-        return {"message_parts": ["Failed to analyze the video."]}
+        return {"message_parts": ["\n[Error: Failed to analyze the video.]"]}
