@@ -9,6 +9,7 @@ export default function AnalyzePanel() {
   const [inputText, setInputText] = useState("");
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [listening, setListening] = useState(false);
 
   const messagesEndRef = useRef(null);
 
@@ -163,13 +164,17 @@ export default function AnalyzePanel() {
           {/* Mic Button */}
           <button
             onClick={() => {
-              // trigger voice command
-              document.getElementById("hidden-mic-trigger")?.click();
+              document.querySelector("#voice-hidden-btn")?.click();
             }}
             disabled={loading}
-            className="p-2 rounded-lg hover:bg-zinc-700 transition-all disabled:opacity-50"
+            className={`p-2 rounded-lg transition-all duration-200 ${
+              listening ? "bg-red-600 animate-pulse" : "hover:bg-zinc-700"
+            }`}
           >
-            <Mic size={18} />
+            <Mic
+              size={18}
+              className={listening ? "text-white" : "text-zinc-400"}
+            />
           </button>
         </div>
 
@@ -190,7 +195,7 @@ export default function AnalyzePanel() {
           <VoiceCommand
             onVoiceInput={(text) => handleUserQuery(text)}
             disabled={loading}
-            triggerId="hidden-mic-trigger"
+            setListening={setListening}
           />
         </div>
       </div>

@@ -50,6 +50,23 @@ def command_understanding_node(state: AgentState) -> dict:
     - And to mention explicit timestamps like "at 1:20" take   5 seconds before and after -> {{"start": {max(0, curr_time - 5)}, "end": {curr_time + 5}}}
     - And to append in message_parts  mention time in  format of "mm:ss"
 
+    4. GENERAL CONVERSATION (Not related to video)
+
+- If the user says things like:
+  - "who are you"
+  - "what can you do"
+  - "how can you help"
+  - greetings (hi, hello)
+  - thanks
+  - bye
+  - or any question NOT related to video content
+
+Then:
+  - DO NOT enable qa_enabled
+  - DO NOT enable analyze
+  - DO NOT set time_range
+  - Return a friendly short response in message_parts
+
     ### OUTPUT SCHEMA:
     RETURN ONLY VALID JSON. DO NOT explain your reasoning.
     {{

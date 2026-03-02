@@ -1,7 +1,6 @@
 import { useState } from "react";
 
-export default function VoiceCommand({ onVoiceInput, disabled, triggerId }) {
-  const [listening, setListening] = useState(false);
+export default function VoiceCommand({ onVoiceInput, disabled, setListening }) {
   const [error, setError] = useState("");
 
   const startListening = () => {
@@ -26,8 +25,7 @@ export default function VoiceCommand({ onVoiceInput, disabled, triggerId }) {
       onVoiceInput(text);
     };
 
-    recognition.onerror = (event) => {
-      console.error(event);
+    recognition.onerror = () => {
       setListening(false);
       setError("Error listening");
     };
@@ -42,11 +40,10 @@ export default function VoiceCommand({ onVoiceInput, disabled, triggerId }) {
   return (
     <>
       <button
-        id={triggerId}
+        id="voice-hidden-btn"
         onClick={startListening}
         disabled={disabled}
         style={{ display: "none" }}
-        className="cursor-pointer"
       >
         hidden
       </button>
