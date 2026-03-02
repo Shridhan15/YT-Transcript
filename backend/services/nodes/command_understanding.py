@@ -25,16 +25,30 @@ def command_understanding_node(state: AgentState) -> dict:
        - Example "skip 10s": {{"intent": "SEEK", "value": 10}}
        - CRITICAL: Never return strings in the "tasks" array.
 
-    2. **Analyze (Summarization)**:
-       - If the user asks for a summary, overview, or "what is this video about", set "analyze": true.
-       - Set "message_parts": ["I'm analyzing the video transcript to generate a summary..."]
+   2. **Analyze (Full Video Summarization Only)**:
 
+- Set "analyze": true ONLY when the user wants a full video summary or overall explanation.
+- Examples:
+    - "Summarize the video"
+    - "What is this video about?"
+    - "Give me an overview"
+
+- IMPORTANT:
+    - If the user refers to a specific time range (e.g., "last 20 seconds", "at 1:20", "last 5 mins"),
+      DO NOT set "analyze": true.
+    - Instead:
+        - Set "qa_enabled": true
+        - Set "time_range" properly
+
+        
     3. **QA (Specific Questions)**:
        - If the user asks a specific question about content, set "qa_enabled": true and put the question in "qa_question".
 
     ### TIMESTAMP MATH (Reference time: {curr_time}s):
     - "last 2 mins" -> {{"start": {max(0, curr_time - 120)}, "end": {curr_time}}}
     - "what just happened" -> {{"start": {max(0, curr_time - 30)}, "end": {curr_time}}}
+    - And to mention explicit timestamps like "at 1:20" take   5 seconds before and after -> {{"start": {max(0, curr_time - 5)}, "end": {curr_time + 5}}}
+    - And to append in message_parts  mention time in  format of "mm:ss"
 
     ### OUTPUT SCHEMA:
     RETURN ONLY VALID JSON. DO NOT explain your reasoning.

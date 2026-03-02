@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function VoiceCommand({ onVoiceInput, disabled }) {
+export default function VoiceCommand({ onVoiceInput, disabled, triggerId }) {
   const [listening, setListening] = useState(false);
   const [error, setError] = useState("");
 
@@ -32,23 +32,26 @@ export default function VoiceCommand({ onVoiceInput, disabled }) {
       setError("Error listening");
     };
 
+    recognition.onend = () => {
+      setListening(false);
+    };
+
     recognition.start();
   };
 
   return (
-    <div className="flex flex-col gap-2">
+    <>
       <button
+        id={triggerId}
         onClick={startListening}
         disabled={disabled}
-        className={`cursor-pointer text-sm py-2 rounded-xl transition-all ${
-          listening
-            ? "bg-red-600 animate-pulse"
-            : "bg-zinc-700 hover:bg-zinc-600 disabled:opacity-50"
-        }`}
+        style={{ display: "none" }}
+        className="cursor-pointer"
       >
-        {listening ? "Listening..." : " Voice Command"}
+        hidden
       </button>
+
       {error && <span className="text-xs text-red-400">{error}</span>}
-    </div>
+    </>
   );
 }

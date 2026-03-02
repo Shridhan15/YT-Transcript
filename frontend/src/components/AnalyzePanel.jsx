@@ -1,10 +1,12 @@
 import { useEffect, useState, useRef } from "react";
 import { callAgent } from "../api/backend";
 import VoiceCommand from "./VoiceCommand";
-import Typewriter from "./Typewriter"; 
+import Typewriter from "./Typewriter";
+import { Mic, Send } from "lucide-react";
 
 export default function AnalyzePanel() {
   const [url, setUrl] = useState("");
+  const [inputText, setInputText] = useState("");
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -15,11 +17,11 @@ export default function AnalyzePanel() {
       if (event.data?.type === "YOUTUBE_URL") {
         console.log("Received URL:", event.data.url);
         setUrl(event.data.url);
-        setMessages([]); 
+        setMessages([]);
       }
     };
     window.addEventListener("message", handler);
-    window.parent.postMessage({ type: "SIDEBAR_READY" }, "*"); 
+    window.parent.postMessage({ type: "SIDEBAR_READY" }, "*");
     return () => window.removeEventListener("message", handler);
   }, []);
 
@@ -29,6 +31,7 @@ export default function AnalyzePanel() {
 
   const handleUserQuery = async (queryText) => {
     if (!url) return;
+    if (!queryText.trim()) return;
     if (loading) return;
     window.parent.postMessage({ type: "GET_VIDEO_TIME" }, "*");
     const currentTime = await new Promise((resolve) => {
@@ -139,21 +142,57 @@ export default function AnalyzePanel() {
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="flex flex-col gap-3 pt-2 border-t border-zinc-800">
+      <div className="flex items-center gap-2 pt-3 border-t border-zinc-800">
+        {/* Input Field */}
+        <div className="flex items-center flex-1 bg-zinc-800 border border-zinc-700 rounded-2xl px-3 focus-within:ring-2 focus-within:ring-blue-500 transition-all">
+          <input
+            type="text"
+            placeholder="Ask about this video or control playback..."
+            value={inputText}
+            onChange={(e) => setInputText(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !loading) {
+                handleUserQuery(inputText);
+                setInputText("");
+              }
+            }}
+            disabled={loading}
+            className="flex-1 bg-transparent text-sm py-3 outline-none placeholder:text-zinc-500 disabled:opacity-50"
+          />
+
+          {/* Mic Button */}
+          <button
+            onClick={() => {
+              // trigger voice command
+              document.getElementById("hidden-mic-trigger")?.click();
+            }}
+            disabled={loading}
+            className="p-2 rounded-lg hover:bg-zinc-700 transition-all disabled:opacity-50"
+          >
+            <Mic size={18} />
+          </button>
+        </div>
+
+        {/* Send Button */}
         <button
-          onClick={() =>
-            handleUserQuery("Analyze this video and give me a summary")
-          }
+          onClick={() => {
+            handleUserQuery(inputText);
+            setInputText("");
+          }}
           disabled={loading}
-          className="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white text-sm py-3 rounded-xl disabled:opacity-50 transition-all font-medium"
+          className="bg-blue-600 hover:bg-blue-700 p-3 rounded-2xl transition-all disabled:opacity-50"
         >
-          {loading ? "Thinking..." : " Analyze & Summarize"}
+          <Send size={18} />
         </button>
 
-        <VoiceCommand
-          onVoiceInput={(text) => handleUserQuery(text)}
-          disabled={loading}
-        />
+        {/* Hidden Voice Component */}
+        <div className="hidden">
+          <VoiceCommand
+            onVoiceInput={(text) => handleUserQuery(text)}
+            disabled={loading}
+            triggerId="hidden-mic-trigger"
+          />
+        </div>
       </div>
     </div>
   );
